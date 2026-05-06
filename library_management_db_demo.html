@@ -1,0 +1,403 @@
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font-sans)}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
+  .tabs{display:flex;gap:4px;padding:1rem 1rem 0;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+  .tab{padding:8px 14px;font-size:13px;color:var(--color-text-secondary);cursor:pointer;border:0.5px solid transparent;border-bottom:none;border-radius:var(--border-radius-md) var(--border-radius-md) 0 0;background:transparent;transition:all .15s}
+  .tab.active{background:var(--color-background-primary);color:var(--color-text-primary);border-color:var(--color-border-tertiary);border-bottom-color:var(--color-background-primary);font-weight:500}
+  .tab:hover:not(.active){background:var(--color-background-tertiary)}
+  .panel{display:none;padding:1rem}
+  .panel.active{display:block}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
+  .stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+  .stat-label{font-size:12px;color:var(--color-text-tertiary);margin-bottom:4px}
+  .stat-val{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+  .tbl-wrap{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden}
+  table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+  th{background:var(--color-background-secondary);padding:8px 12px;text-align:left;font-weight:500;font-size:12px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+  td{padding:9px 12px;color:var(--color-text-primary);border-bottom:0.5px solid var(--color-border-tertiary)}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:var(--color-background-secondary)}
+  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+  .badge-green{background:var(--color-background-success);color:var(--color-text-success)}
+  .badge-amber{background:#FAEEDA;color:#633806}
+  .badge-red{background:var(--color-background-danger);color:var(--color-text-danger)}
+  .badge-blue{background:#E6F1FB;color:#0C447C}
+  .badge-gray{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+  .sql-block{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:1rem;font-size:12px;font-family:var(--font-mono);line-height:1.7;overflow-x:auto;white-space:pre;margin-bottom:1rem}
+  .kw{color:#185FA5;font-weight:500}
+  .fn{color:#854F0B}
+  .str{color:#3B6D11}
+  .cm{color:var(--color-text-tertiary)}
+  .section-title{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:1rem}
+  .section-title:first-child{margin-top:0}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+  input,select{width:100%;font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary)}
+  .btn-row{display:flex;gap:8px;margin-top:10px}
+  button.action{font-size:13px;padding:7px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .12s}
+  button.action:hover{background:var(--color-background-secondary)}
+  button.action.primary{background:#185FA5;color:#fff;border-color:#185FA5}
+  button.action.primary:hover{background:#0C447C}
+  button.action.danger{color:var(--color-text-danger);border-color:var(--color-border-tertiary)}
+  button.action.danger:hover{background:var(--color-background-danger)}
+  .toast{display:none;font-size:12px;padding:6px 10px;border-radius:var(--border-radius-md);margin-top:8px}
+  .toast.success{background:var(--color-background-success);color:var(--color-text-success)}
+  .toast.error{background:var(--color-background-danger);color:var(--color-text-danger)}
+  .er-wrap{padding:0.5rem 0}
+  .pk{color:#185FA5;font-weight:500}
+  .fk{color:#854F0B}
+  .search-bar{display:flex;gap:8px;margin-bottom:12px}
+  .search-bar input{flex:1}
+</style>
+
+<h2 class="sr-only">Library Management Database — interactive demo with tables for books, members, and borrow records, plus SQL queries and an ER diagram.</h2>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('data')"><i class="ti ti-table" style="font-size:14px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>Data</button>
+  <button class="tab" onclick="switchTab('crud')"><i class="ti ti-edit" style="font-size:14px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>CRUD</button>
+  <button class="tab" onclick="switchTab('queries')"><i class="ti ti-code" style="font-size:14px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>SQL queries</button>
+  <button class="tab" onclick="switchTab('er')"><i class="ti ti-git-fork" style="font-size:14px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i>ER diagram</button>
+</div>
+
+<div id="tab-data" class="panel active">
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Books</div><div class="stat-val" id="stat-books">5</div></div>
+    <div class="stat"><div class="stat-label">Members</div><div class="stat-val" id="stat-members">4</div></div>
+    <div class="stat"><div class="stat-label">Active borrows</div><div class="stat-val" id="stat-active">3</div></div>
+  </div>
+
+  <div class="section-title">Books</div>
+  <div class="search-bar"><input id="book-search" placeholder="Search books..." oninput="renderBooks()"><i class="ti ti-search" style="font-size:16px;color:var(--color-text-tertiary);align-self:center;margin-left:-30px" aria-hidden="true"></i></div>
+  <div class="tbl-wrap" style="margin-bottom:1rem">
+    <table><thead><tr><th style="width:40px">ID</th><th>Title</th><th>Author</th><th style="width:70px">Year</th><th style="width:90px">Status</th></tr></thead>
+    <tbody id="books-body"></tbody></table>
+  </div>
+
+  <div class="section-title">Members</div>
+  <div class="tbl-wrap" style="margin-bottom:1rem">
+    <table><thead><tr><th style="width:40px">ID</th><th>Name</th><th>Email</th><th style="width:90px">Joined</th></tr></thead>
+    <tbody id="members-body"></tbody></table>
+  </div>
+
+  <div class="section-title">Borrow records</div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th style="width:40px">ID</th><th>Member</th><th>Book</th><th style="width:90px">Borrowed</th><th style="width:90px">Due</th><th style="width:80px">Status</th></tr></thead>
+    <tbody id="borrows-body"></tbody></table>
+  </div>
+</div>
+
+<div id="tab-crud" class="panel">
+  <div class="section-title">Add a book</div>
+  <div class="form-row">
+    <input id="new-title" placeholder="Title">
+    <input id="new-author" placeholder="Author">
+  </div>
+  <div class="form-row">
+    <input id="new-year" placeholder="Year" type="number" min="1800" max="2030">
+    <input id="new-genre" placeholder="Genre">
+  </div>
+  <div class="btn-row">
+    <button class="action primary" onclick="addBook()"><i class="ti ti-plus" style="font-size:14px" aria-hidden="true"></i>Insert book</button>
+  </div>
+  <div id="book-toast" class="toast"></div>
+
+  <div class="section-title" style="margin-top:1.5rem">Issue a borrow</div>
+  <div class="form-row">
+    <select id="borrow-member"><option value="">Select member…</option></select>
+    <select id="borrow-book"><option value="">Select available book…</option></select>
+  </div>
+  <div class="btn-row">
+    <button class="action primary" onclick="issueBorrow()"><i class="ti ti-arrow-right" style="font-size:14px" aria-hidden="true"></i>Issue borrow</button>
+  </div>
+  <div id="borrow-toast" class="toast"></div>
+
+  <div class="section-title" style="margin-top:1.5rem">Return a book</div>
+  <select id="return-borrow" style="width:100%;font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);margin-bottom:8px"><option value="">Select active borrow…</option></select>
+  <div class="btn-row">
+    <button class="action" onclick="returnBook()"><i class="ti ti-check" style="font-size:14px" aria-hidden="true"></i>Mark returned</button>
+  </div>
+  <div id="return-toast" class="toast"></div>
+
+  <div class="section-title" style="margin-top:1.5rem">Delete a book</div>
+  <select id="delete-book" style="width:100%;font-size:13px;padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);margin-bottom:8px"><option value="">Select book…</option></select>
+  <div class="btn-row">
+    <button class="action danger" onclick="deleteBook()"><i class="ti ti-trash" style="font-size:14px" aria-hidden="true"></i>Delete book</button>
+  </div>
+  <div id="delete-toast" class="toast"></div>
+</div>
+
+<div id="tab-queries" class="panel">
+  <div class="section-title">Schema — CREATE TABLE</div>
+  <div class="sql-block"><span class="cm">-- Books table</span>
+<span class="kw">CREATE TABLE</span> books (
+  book_id   <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
+  title     <span class="fn">VARCHAR</span>(255) <span class="kw">NOT NULL</span>,
+  author    <span class="fn">VARCHAR</span>(255) <span class="kw">NOT NULL</span>,
+  year      <span class="fn">YEAR</span>,
+  genre     <span class="fn">VARCHAR</span>(100),
+  status    <span class="fn">ENUM</span>(<span class="str">'available'</span>, <span class="str">'borrowed'</span>) <span class="kw">DEFAULT</span> <span class="str">'available'</span>
+);
+
+<span class="cm">-- Members table</span>
+<span class="kw">CREATE TABLE</span> members (
+  member_id <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
+  name      <span class="fn">VARCHAR</span>(255) <span class="kw">NOT NULL</span>,
+  email     <span class="fn">VARCHAR</span>(255) <span class="kw">UNIQUE NOT NULL</span>,
+  joined    <span class="fn">DATE</span> <span class="kw">DEFAULT</span> <span class="fn">CURDATE</span>()
+);
+
+<span class="cm">-- Borrow records (junction table)</span>
+<span class="kw">CREATE TABLE</span> borrows (
+  borrow_id   <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
+  member_id   <span class="fn">INT</span> <span class="kw">REFERENCES</span> members(member_id),
+  book_id     <span class="fn">INT</span> <span class="kw">REFERENCES</span> books(book_id),
+  borrow_date <span class="fn">DATE</span> <span class="kw">DEFAULT</span> <span class="fn">CURDATE</span>(),
+  due_date    <span class="fn">DATE</span> <span class="kw">NOT NULL</span>,
+  returned    <span class="fn">BOOLEAN</span> <span class="kw">DEFAULT</span> <span class="fn">FALSE</span>
+);</div>
+
+  <div class="section-title">Read — SELECT with JOIN</div>
+  <div class="sql-block"><span class="cm">-- All active borrows with member and book details</span>
+<span class="kw">SELECT</span>
+  b.borrow_id,
+  m.name        <span class="kw">AS</span> member_name,
+  bk.title      <span class="kw">AS</span> book_title,
+  b.borrow_date,
+  b.due_date,
+  <span class="fn">DATEDIFF</span>(b.due_date, <span class="fn">CURDATE</span>()) <span class="kw">AS</span> days_remaining
+<span class="kw">FROM</span>    borrows b
+<span class="kw">JOIN</span>    members m  <span class="kw">ON</span> b.member_id = m.member_id
+<span class="kw">JOIN</span>    books   bk <span class="kw">ON</span> b.book_id   = bk.book_id
+<span class="kw">WHERE</span>   b.returned = <span class="fn">FALSE</span>
+<span class="kw">ORDER BY</span> b.due_date <span class="kw">ASC</span>;</div>
+
+  <div class="section-title">Update — mark as returned</div>
+  <div class="sql-block"><span class="kw">UPDATE</span> borrows
+<span class="kw">SET</span>    returned = <span class="fn">TRUE</span>
+<span class="kw">WHERE</span>  borrow_id = <span class="str">?</span>;
+
+<span class="kw">UPDATE</span> books
+<span class="kw">SET</span>    status = <span class="str">'available'</span>
+<span class="kw">WHERE</span>  book_id = (
+  <span class="kw">SELECT</span> book_id <span class="kw">FROM</span> borrows <span class="kw">WHERE</span> borrow_id = <span class="str">?</span>
+);</div>
+
+  <div class="section-title">Aggregate — most borrowed books</div>
+  <div class="sql-block"><span class="kw">SELECT</span>
+  bk.title,
+  bk.author,
+  <span class="fn">COUNT</span>(b.borrow_id) <span class="kw">AS</span> times_borrowed
+<span class="kw">FROM</span>      books   bk
+<span class="kw">LEFT JOIN</span> borrows b <span class="kw">ON</span> bk.book_id = b.book_id
+<span class="kw">GROUP BY</span>  bk.book_id
+<span class="kw">ORDER BY</span>  times_borrowed <span class="kw">DESC</span>
+<span class="kw">LIMIT</span>     5;</div>
+
+  <div class="section-title">Constraint — overdue books</div>
+  <div class="sql-block"><span class="kw">SELECT</span>
+  m.name, m.email,
+  bk.title,
+  <span class="fn">DATEDIFF</span>(<span class="fn">CURDATE</span>(), b.due_date) <span class="kw">AS</span> days_overdue
+<span class="kw">FROM</span>  borrows b
+<span class="kw">JOIN</span>  members m  <span class="kw">ON</span> b.member_id = m.member_id
+<span class="kw">JOIN</span>  books   bk <span class="kw">ON</span> b.book_id   = bk.book_id
+<span class="kw">WHERE</span> b.returned = <span class="fn">FALSE</span>
+  <span class="kw">AND</span> b.due_date &lt; <span class="fn">CURDATE</span>();</div>
+</div>
+
+<div id="tab-er" class="panel">
+  <div id="erd-container"></div>
+</div>
+
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false, theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark, fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+const erdDef = `erDiagram
+  MEMBERS ||--o{ BORROWS : "borrows"
+  BOOKS   ||--o{ BORROWS : "borrowed in"
+  MEMBERS {
+    int member_id PK
+    string name
+    string email
+    date joined
+  }
+  BOOKS {
+    int book_id PK
+    string title
+    string author
+    year year
+    string genre
+    string status
+  }
+  BORROWS {
+    int borrow_id PK
+    int member_id FK
+    int book_id FK
+    date borrow_date
+    date due_date
+    bool returned
+  }`;
+try {
+  const { svg } = await mermaid.render('erd-svg', erdDef);
+  document.getElementById('erd-container').innerHTML = svg;
+  document.querySelectorAll('#erd-container svg .node').forEach(node => {
+    const firstPath = node.querySelector('path[d]');
+    if (!firstPath) return;
+    const d = firstPath.getAttribute('d');
+    const nums = d.match(/-?[\d.]+/g)?.map(Number);
+    if (!nums || nums.length < 8) return;
+    const xs = [nums[0],nums[2],nums[4],nums[6]], ys = [nums[1],nums[3],nums[5],nums[7]];
+    const x=Math.min(...xs), y=Math.min(...ys), w=Math.max(...xs)-x, h=Math.max(...ys)-y;
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',x); rect.setAttribute('y',y);
+    rect.setAttribute('width',w); rect.setAttribute('height',h); rect.setAttribute('rx','8');
+    for (const a of ['fill','stroke','stroke-width','class','style'])
+      if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+    firstPath.replaceWith(rect);
+  });
+  document.querySelectorAll('#erd-container svg .row-rect-odd path, #erd-container svg .row-rect-even path')
+    .forEach(p => p.setAttribute('stroke','none'));
+} catch(e) { document.getElementById('erd-container').innerHTML = '<p style="font-size:13px;color:var(--color-text-secondary);padding:1rem">ER diagram renders in supported browsers.</p>'; }
+window._erdReady = true;
+</script>
+
+<script>
+let books = [
+  {id:1, title:'The Pragmatic Programmer', author:'Hunt & Thomas', year:1999, genre:'Technology', status:'borrowed'},
+  {id:2, title:'Clean Code', author:'Robert C. Martin', year:2008, genre:'Technology', status:'available'},
+  {id:3, title:'Dune', author:'Frank Herbert', year:1965, genre:'Sci-Fi', status:'borrowed'},
+  {id:4, title:'Design Patterns', author:'Gang of Four', year:1994, genre:'Technology', status:'available'},
+  {id:5, title:'The Alchemist', author:'Paulo Coelho', year:1988, genre:'Fiction', status:'borrowed'},
+];
+let members = [
+  {id:1, name:'Aisha Patel', email:'aisha@example.com', joined:'2024-01-10'},
+  {id:2, name:'Carlos Mena', email:'carlos@example.com', joined:'2024-03-22'},
+  {id:3, name:'Priya Sharma', email:'priya@example.com', joined:'2024-06-05'},
+  {id:4, name:'James Osei', email:'james@example.com', joined:'2025-01-15'},
+];
+let borrows = [
+  {id:1, memberId:1, bookId:1, borrowed:'2025-04-01', due:'2025-05-01', returned:false},
+  {id:2, memberId:2, bookId:3, borrowed:'2025-04-10', due:'2025-04-30', returned:false},
+  {id:3, memberId:3, bookId:5, borrowed:'2025-04-20', due:'2025-05-20', returned:false},
+];
+let nextBookId = 6, nextBorrowId = 4;
+
+function statusBadge(s) {
+  return s==='available'
+    ? '<span class="badge badge-green">available</span>'
+    : '<span class="badge badge-amber">borrowed</span>';
+}
+function overdueBadge(due, ret) {
+  if (ret) return '<span class="badge badge-gray">returned</span>';
+  const d = new Date(due), n = new Date();
+  return d < n
+    ? '<span class="badge badge-red">overdue</span>'
+    : '<span class="badge badge-blue">active</span>';
+}
+function memberName(id){ return (members.find(m=>m.id===id)||{name:'?'}).name; }
+function bookTitle(id){ return (books.find(b=>b.id===id)||{title:'?'}).title; }
+
+function renderBooks() {
+  const q = document.getElementById('book-search').value.toLowerCase();
+  document.getElementById('books-body').innerHTML = books
+    .filter(b=>b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q))
+    .map(b=>`<tr><td>${b.id}</td><td>${b.title}</td><td>${b.author}</td><td>${b.year}</td><td>${statusBadge(b.status)}</td></tr>`)
+    .join('');
+}
+function renderMembers() {
+  document.getElementById('members-body').innerHTML = members
+    .map(m=>`<tr><td>${m.id}</td><td>${m.name}</td><td style="color:var(--color-text-secondary)">${m.email}</td><td>${m.joined}</td></tr>`)
+    .join('');
+}
+function renderBorrows() {
+  document.getElementById('borrows-body').innerHTML = borrows
+    .map(b=>`<tr><td>${b.id}</td><td>${memberName(b.memberId)}</td><td>${bookTitle(b.bookId)}</td><td>${b.borrowed}</td><td>${b.due}</td><td>${overdueBadge(b.due,b.returned)}</td></tr>`)
+    .join('');
+}
+function updateStats() {
+  document.getElementById('stat-books').textContent = books.length;
+  document.getElementById('stat-members').textContent = members.length;
+  document.getElementById('stat-active').textContent = borrows.filter(b=>!b.returned).length;
+}
+function populateSelects() {
+  const mSel = document.getElementById('borrow-member');
+  mSel.innerHTML = '<option value="">Select member…</option>' + members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  const avail = books.filter(b=>b.status==='available');
+  document.getElementById('borrow-book').innerHTML = '<option value="">Select available book…</option>' + avail.map(b=>`<option value="${b.id}">${b.title}</option>`).join('');
+  const active = borrows.filter(b=>!b.returned);
+  document.getElementById('return-borrow').innerHTML = '<option value="">Select active borrow…</option>' + active.map(b=>`<option value="${b.id}">${memberName(b.memberId)} → ${bookTitle(b.bookId)}</option>`).join('');
+  document.getElementById('delete-book').innerHTML = '<option value="">Select book…</option>' + books.map(b=>`<option value="${b.id}">${b.title}</option>`).join('');
+}
+function renderAll() { renderBooks(); renderMembers(); renderBorrows(); updateStats(); populateSelects(); }
+
+function toast(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.className = 'toast '+type; el.style.display='block';
+  setTimeout(()=>{ el.style.display='none'; }, 3000);
+}
+
+window.addBook = function() {
+  const t=document.getElementById('new-title').value.trim();
+  const a=document.getElementById('new-author').value.trim();
+  const y=document.getElementById('new-year').value.trim();
+  const g=document.getElementById('new-genre').value.trim();
+  if (!t||!a) { toast('book-toast','Title and author are required.','error'); return; }
+  books.push({id:nextBookId++, title:t, author:a, year:y||'—', genre:g||'—', status:'available'});
+  ['new-title','new-author','new-year','new-genre'].forEach(id=>{ document.getElementById(id).value=''; });
+  renderAll();
+  toast('book-toast','Book added successfully.','success');
+};
+
+window.issueBorrow = function() {
+  const mId = parseInt(document.getElementById('borrow-member').value);
+  const bId = parseInt(document.getElementById('borrow-book').value);
+  if (!mId||!bId) { toast('borrow-toast','Select a member and a book.','error'); return; }
+  const due = new Date(); due.setDate(due.getDate()+14);
+  const dueStr = due.toISOString().slice(0,10);
+  const today = new Date().toISOString().slice(0,10);
+  borrows.push({id:nextBorrowId++, memberId:mId, bookId:bId, borrowed:today, due:dueStr, returned:false});
+  books.find(b=>b.id===bId).status='borrowed';
+  renderAll();
+  toast('borrow-toast','Borrow issued. Due '+dueStr+'.','success');
+};
+
+window.returnBook = function() {
+  const bid = parseInt(document.getElementById('return-borrow').value);
+  if (!bid) { toast('return-toast','Select an active borrow.','error'); return; }
+  const rec = borrows.find(b=>b.id===bid);
+  rec.returned = true;
+  books.find(b=>b.id===rec.bookId).status='available';
+  renderAll();
+  toast('return-toast','Book returned successfully.','success');
+};
+
+window.deleteBook = function() {
+  const bid = parseInt(document.getElementById('delete-book').value);
+  if (!bid) { toast('delete-toast','Select a book to delete.','error'); return; }
+  const active = borrows.find(b=>b.bookId===bid&&!b.returned);
+  if (active) { toast('delete-toast','Cannot delete — book is currently borrowed.','error'); return; }
+  books = books.filter(b=>b.id!==bid);
+  renderAll();
+  toast('delete-toast','Book deleted.','success');
+};
+
+window.switchTab = function(name) {
+  document.querySelectorAll('.tab').forEach((t,i)=>{ t.classList.toggle('active', ['data','crud','queries','er'][i]===name); });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+};
+
+renderAll();
+</script>

@@ -1,0 +1,250 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.app{padding:1rem 0;max-width:600px}
+.add-row{display:flex;gap:8px;margin-bottom:1.25rem}
+.add-row input{flex:1;font-size:14px}
+.add-row select{font-size:13px;width:120px}
+.add-row button{display:flex;align-items:center;gap:5px;padding:0 14px;font-size:13px;white-space:nowrap}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
+.stat-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px}
+.stat-val{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.progress-wrap{margin-bottom:1.25rem}
+.progress-bar{height:5px;border-radius:3px;background:var(--color-border-tertiary);overflow:hidden;margin-top:5px}
+.progress-fill{height:100%;border-radius:3px;background:#1D9E75;transition:width .4s}
+.filters{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.filter-btn{padding:4px 12px;font-size:12px;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;color:var(--color-text-secondary);transition:background .12s,color .12s}
+.filter-btn.active{background:var(--color-background-secondary);color:var(--color-text-primary);font-weight:500;border-color:var(--color-border-primary)}
+.task-list{display:flex;flex-direction:column;gap:6px;min-height:40px}
+.task-item{display:flex;align-items:center;gap:10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;transition:opacity .2s}
+.task-item.done{opacity:.55}
+.task-cb{width:18px;height:18px;border-radius:4px;border:0.5px solid var(--color-border-secondary);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s}
+.task-cb.checked{background:#1D9E75;border-color:#1D9E75}
+.task-text{flex:1;font-size:14px;color:var(--color-text-primary);min-width:0;word-break:break-word;line-height:1.4}
+.task-item.done .task-text{text-decoration:line-through;color:var(--color-text-tertiary)}
+.task-meta{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.prio-badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500;white-space:nowrap}
+.prio-high{background:#FCEBEB;color:#A32D2D}
+.prio-med{background:#FAEEDA;color:#633806}
+.prio-low{background:#EAF3DE;color:#27500A}
+.task-date{font-size:11px;color:var(--color-text-tertiary);white-space:nowrap}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--color-text-tertiary);display:flex;align-items:center;padding:2px;border-radius:4px;transition:color .12s}
+.del-btn:hover{color:var(--color-text-danger)}
+.edit-btn{background:none;border:none;cursor:pointer;color:var(--color-text-tertiary);display:flex;align-items:center;padding:2px;border-radius:4px;transition:color .12s}
+.edit-btn:hover{color:var(--color-text-info)}
+.empty{text-align:center;padding:2.5rem 0;color:var(--color-text-tertiary);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.clear-done{font-size:11px;color:var(--color-text-tertiary);background:none;border:none;cursor:pointer;padding:0}
+.clear-done:hover{color:var(--color-text-danger)}
+.storage-note{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--color-text-tertiary);margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary)}
+.sort-row{display:flex;align-items:center;gap:8px;margin-bottom:.75rem}
+.sort-row label{font-size:11px;color:var(--color-text-tertiary)}
+.sort-row select{font-size:12px;padding:3px 8px;width:auto}
+</style>
+
+<h2 class="sr-only">To-do list app — add, complete, filter and delete tasks with localStorage persistence</h2>
+
+<div class="app" id="app">
+
+<div class="add-row">
+  <input type="text" id="task-input" placeholder="Add a new task..." maxlength="120" />
+  <select id="prio-select">
+    <option value="med">Medium</option>
+    <option value="high">High</option>
+    <option value="low">Low</option>
+  </select>
+  <button onclick="addTask()"><i class="ti ti-plus" style="font-size:15px" aria-hidden="true"></i> Add</button>
+</div>
+
+<div class="stats-row">
+  <div class="stat"><div class="stat-label">Total</div><div class="stat-val" id="stat-total">0</div></div>
+  <div class="stat"><div class="stat-label">Completed</div><div class="stat-val" id="stat-done">0</div></div>
+  <div class="stat"><div class="stat-label">Remaining</div><div class="stat-val" id="stat-left">0</div></div>
+</div>
+
+<div class="progress-wrap">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:11px;color:var(--color-text-tertiary)">Progress</span>
+    <span style="font-size:11px;color:var(--color-text-tertiary)" id="pct-label">0%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div class="filters">
+  <span style="font-size:11px;color:var(--color-text-tertiary);align-self:center">Filter:</span>
+  <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+  <button class="filter-btn" onclick="setFilter('active',this)">Active</button>
+  <button class="filter-btn" onclick="setFilter('done',this)">Completed</button>
+  <button class="filter-btn" onclick="setFilter('high',this)">High priority</button>
+</div>
+
+<div class="sort-row">
+  <label>Sort by</label>
+  <select id="sort-select" onchange="render()">
+    <option value="newest">Newest first</option>
+    <option value="oldest">Oldest first</option>
+    <option value="prio">Priority</option>
+    <option value="alpha">A → Z</option>
+  </select>
+</div>
+
+<div class="section-label">
+  <span id="list-label">Tasks</span>
+  <button class="clear-done" onclick="clearDone()">Clear completed</button>
+</div>
+
+<div class="task-list" id="task-list"></div>
+
+<div class="storage-note">
+  <i class="ti ti-device-floppy" style="font-size:13px" aria-hidden="true"></i>
+  Tasks are saved to localStorage and persist after refresh
+</div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'todo_demo_tasks';
+let tasks = [];
+let filter = 'all';
+
+const PRIO_ORDER = {high:0,med:1,low:2};
+const PRIO_LABEL = {high:'High',med:'Medium',low:'Low'};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    tasks = raw ? JSON.parse(raw) : defaultTasks();
+  } catch(e) {
+    tasks = defaultTasks();
+  }
+}
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch(e) {}
+}
+
+function defaultTasks() {
+  const now = Date.now();
+  return [
+    {id: now-4000, text:'Build the project structure', done:true,  prio:'high', created: now-4000},
+    {id: now-3000, text:'Write unit tests',            done:false, prio:'med',  created: now-3000},
+    {id: now-2000, text:'Review pull requests',        done:false, prio:'high', created: now-2000},
+    {id: now-1000, text:'Update the README file',      done:false, prio:'low',  created: now-1000},
+    {id: now,      text:'Deploy to production',        done:false, prio:'med',  created: now},
+  ];
+}
+
+function addTask() {
+  const input = document.getElementById('task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const prio = document.getElementById('prio-select').value;
+  tasks.unshift({id: Date.now(), text, done: false, prio, created: Date.now()});
+  input.value = '';
+  save();
+  render();
+}
+
+function toggleTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (t) { t.done = !t.done; save(); render(); }
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(x => x.id !== id);
+  save();
+  render();
+}
+
+function clearDone() {
+  tasks = tasks.filter(x => !x.done);
+  save();
+  render();
+}
+
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function sortedTasks(list) {
+  const s = document.getElementById('sort-select').value;
+  const copy = [...list];
+  if (s === 'newest') copy.sort((a,b) => b.created - a.created);
+  else if (s === 'oldest') copy.sort((a,b) => a.created - b.created);
+  else if (s === 'prio') copy.sort((a,b) => PRIO_ORDER[a.prio] - PRIO_ORDER[b.prio]);
+  else if (s === 'alpha') copy.sort((a,b) => a.text.localeCompare(b.text));
+  return copy;
+}
+
+function filteredTasks() {
+  if (filter === 'active') return tasks.filter(x => !x.done);
+  if (filter === 'done')   return tasks.filter(x => x.done);
+  if (filter === 'high')   return tasks.filter(x => x.prio === 'high');
+  return tasks;
+}
+
+function timeAgo(ts) {
+  const diff = Math.floor((Date.now() - ts) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function render() {
+  const total = tasks.length;
+  const done = tasks.filter(x => x.done).length;
+  const left = total - done;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('stat-left').textContent = left;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('pct-label').textContent = pct + '%';
+
+  const visible = sortedTasks(filteredTasks());
+  const label = filter === 'all' ? `All tasks (${total})` :
+                filter === 'active' ? `Active (${left})` :
+                filter === 'done' ? `Completed (${done})` :
+                `High priority (${tasks.filter(x=>x.prio==='high').length})`;
+  document.getElementById('list-label').textContent = label;
+
+  const list = document.getElementById('task-list');
+  if (!visible.length) {
+    list.innerHTML = `<div class="empty"><i class="ti ti-clipboard-list" style="font-size:28px" aria-hidden="true"></i><span>${filter === 'done' ? 'No completed tasks yet' : filter === 'active' ? 'All tasks done!' : 'No tasks here'}</span>${filter === 'all' ? '<span style="font-size:12px">Type above to add your first task</span>' : ''}</div>`;
+    return;
+  }
+
+  list.innerHTML = visible.map(t => {
+    const prioClass = t.prio === 'high' ? 'prio-high' : t.prio === 'low' ? 'prio-low' : 'prio-med';
+    return `<div class="task-item${t.done ? ' done' : ''}">
+      <div class="task-cb${t.done ? ' checked' : ''}" onclick="toggleTask(${t.id})" role="checkbox" aria-checked="${t.done}" tabindex="0">
+        ${t.done ? '<i class="ti ti-check" style="font-size:12px;color:#fff" aria-hidden="true"></i>' : ''}
+      </div>
+      <div class="task-text">${escHtml(t.text)}</div>
+      <div class="task-meta">
+        <span class="prio-badge ${prioClass}">${PRIO_LABEL[t.prio]}</span>
+        <span class="task-date">${timeAgo(t.created)}</span>
+        <button class="del-btn" onclick="deleteTask(${t.id})" aria-label="Delete task"><i class="ti ti-trash" style="font-size:15px" aria-hidden="true"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.getElementById('task-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addTask();
+});
+
+load();
+render();
+</script>
