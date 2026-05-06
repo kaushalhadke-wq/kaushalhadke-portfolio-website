@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kaushal Hadke | Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:      #f9f7f4;
+      --surface: #ffffff;
+      --border:  #e4e0da;
+      --text:    #1a1a1a;
+      --muted:   #6b6b6b;
+      --accent:  #2563eb;
+      --accent2: #16a34a;
+      --radius:  8px;
+      --mono:    'Space Mono', monospace;
+      --sans:    'Inter', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ---- NAV ---- */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    nav {
+      max-width: 960px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between; height: 60px;
+    }
+    .nav-logo { font-family: var(--mono); font-weight: 700; font-size: 1rem; color: var(--accent); }
+    .nav-links { display: flex; gap: 4px; list-style: none; }
+    .nav-links a {
+      font-size: 0.875rem; font-weight: 500; padding: 6px 14px;
+      border-radius: var(--radius); color: var(--muted);
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { background: var(--bg); color: var(--text); }
+
+    /* ---- SHARED ---- */
+    section { padding: 80px 24px; }
+    .wrapper { max-width: 960px; margin: 0 auto; }
+    .section-header { margin-bottom: 40px; }
+    .section-tag {
+      font-family: var(--mono); font-size: 0.72rem; color: var(--accent2);
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; display: block;
+    }
+    .section-title { font-size: 2rem; font-weight: 600; letter-spacing: -0.5px; }
+    .section-sub { color: var(--muted); margin-top: 8px; font-size: 0.95rem; }
+
+    /* ---- HOME ---- */
+    #home { background: var(--bg); padding-top: 90px; padding-bottom: 80px; }
+    .hero-inner {
+      max-width: 960px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 200px;
+      gap: 48px; align-items: center;
+    }
+    .hero-tag {
+      display: inline-block; font-family: var(--mono); font-size: 0.75rem;
+      color: var(--accent); background: #eff6ff; padding: 4px 10px;
+      border-radius: 4px; margin-bottom: 16px; letter-spacing: 0.5px;
+    }
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3rem); font-weight: 600;
+      line-height: 1.15; letter-spacing: -1px; margin-bottom: 16px;
+    }
+    .hero-title span { color: var(--accent); }
+    .hero-sub { font-size: 1.05rem; color: var(--muted); max-width: 480px; margin-bottom: 32px; }
+    .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-block; padding: 10px 22px; border-radius: var(--radius);
+      font-size: 0.875rem; font-weight: 600; cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s; border: none;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+    .avatar-box {
+      width: 180px; height: 180px; border-radius: 50%;
+      border: 3px solid var(--border); background: #e9ecef;
+      display: flex; align-items: center; justify-content: center; font-size: 4rem;
+    }
+    .stats-row { max-width: 960px; margin: 48px auto 0; display: flex; gap: 20px; }
+    .stat-card {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px; text-align: center; transition: box-shadow 0.2s;
+    }
+    .stat-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+    .stat-num { font-family: var(--mono); font-size: 1.75rem; font-weight: 700; color: var(--accent); display: block; }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+    /* ---- PROJECTS ---- */
+    #projects { background: var(--surface); }
+    .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .project-card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .project-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .project-thumb {
+      height: 130px; display: flex; align-items: center;
+      justify-content: center; font-size: 3rem; background: #f1f5f9;
+    }
+    .project-body { padding: 18px; }
+    .project-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .tag { font-size: 0.7rem; font-family: var(--mono); padding: 2px 8px; border-radius: 3px; background: #eff6ff; color: var(--accent); }
+    .project-name { font-weight: 600; font-size: 1rem; margin-bottom: 6px; }
+    .project-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.55; margin-bottom: 14px; }
+    .project-links { display: flex; gap: 10px; }
+    .project-links a {
+      font-size: 0.8rem; font-weight: 600; color: var(--accent);
+      border: 1px solid var(--border); padding: 5px 12px; border-radius: 4px;
+      background: var(--surface); transition: background 0.2s;
+    }
+    .project-links a:hover { background: #eff6ff; }
+
+    /* ---- ABOUT ---- */
+    #about { background: var(--bg); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+    .about-bio h2 { font-size: 1.6rem; font-weight: 600; margin-bottom: 14px; }
+    .about-bio p { color: var(--muted); margin-bottom: 14px; font-size: 0.95rem; }
+    .education-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; margin-top: 24px;
+    }
+    .education-box h4 {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--muted); margin-bottom: 10px; font-family: var(--mono);
+    }
+    .education-box p { font-weight: 600; font-size: 0.95rem; }
+    .education-box span { font-size: 0.85rem; color: var(--muted); }
+    .hobbies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .hobby-chip {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 5px 14px; font-size: 0.8rem;
+    }
+    .skills-section h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 18px; }
+    .skills-list { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    /* ---- CONTACT ---- */
+    #contact { background: var(--surface); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 48px; align-items: start; }
+    .contact-info h2 { font-size: 1.6rem; font-weight: 600; margin-bottom: 14px; }
+    .contact-info p { color: var(--muted); font-size: 0.95rem; margin-bottom: 28px; }
+    .contact-detail { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; font-size: 0.9rem; }
+    .contact-icon {
+      width: 36px; height: 36px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem;
+    }
+
+    /* ---- FOOTER ---- */
+    footer {
+      border-top: 1px solid var(--border); text-align: center;
+      padding: 28px 24px; font-size: 0.8rem; color: var(--muted); background: var(--bg);
+    }
+    footer span { color: var(--accent); }
+
+    /* ---- MEDIA QUERIES ---- */
+    @media (max-width: 768px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; }
+      .hero-sub { max-width: 100%; }
+      .btn-group { justify-content: center; }
+      .avatar-box { margin: 0 auto; }
+      .stats-row { flex-direction: column; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .about-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .hero-title { font-size: 1.75rem; }
+      .section-title { font-size: 1.5rem; }
+      section { padding: 60px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <header>
+    <nav>
+      <div class="nav-logo">kaushal.dev</div>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- HOME -->
+  <section id="home">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag">👋 Welcome to my portfolio</div>
+        <h1 class="hero-title">Hi, I'm <span>Kaushal</span><br/>Hadke</h1>
+        <p class="hero-sub">Data science student at MITAOE, Alandi. I love building things with code, exploring new technologies, and solving real-world problems one project at a time.</p>
+        <div class="btn-group">
+          <a href="#projects" class="btn btn-primary">View My Projects</a>
+          <a href="#contact" class="btn btn-outline">Get In Touch</a>
+        </div>
+      </div>
+      <div class="avatar-box">👨‍💻</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><span class="stat-num">5+</span><div class="stat-label">Projects Completed</div></div>
+      <div class="stat-card"><span class="stat-num">6+</span><div class="stat-label">Technologies Learned</div></div>
+      <div class="stat-card"><span class="stat-num">1st</span><div class="stat-label">Year of Engineering</div></div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="wrapper">
+      <div class="section-header">
+        <span class="section-tag">// my work</span>
+        <h2 class="section-title">Projects</h2>
+        <p class="section-sub">A few things I've built while learning. More coming soon!</p>
+      </div>
+      <div class="projects-grid">
+
+        <article class="project-card">
+          <div class="project-thumb">🛒</div>
+          <div class="project-body">
+            <div class="project-tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span></div>
+            <h3 class="project-name">Simple Shopping Cart</h3>
+            <p class="project-desc">A basic e-commerce shopping cart built with vanilla JavaScript. Users can add items, update quantities, and see the total price update in real-time.</p>
+            <div class="project-links"><a href="shopping_cart_demo.html">Live Demo</a><a href="https://github.com/kaushalhadke-wq/shoping-cart">GitHub</a></div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-thumb">🌤️</div>
+          <div class="project-body">
+            <div class="project-tags"><span class="tag">Python</span><span class="tag">API</span><span class="tag">Flask</span></div>
+            <h3 class="project-name">Weather App</h3>
+            <p class="project-desc">A weather forecast app using the OpenWeatherMap API. Enter any city and get current temperature, humidity, and weather conditions instantly.</p>
+            <div class="project-links"><a href="flask_weather_app_demo.html">Live Demo</a><a href="https://github.com/kaushalhadke-wq/Weather-app">GitHub</a></div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-thumb">📋</div>
+          <div class="project-body">
+            <div class="project-tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JS</span></div>
+            <h3 class="project-name">To-Do List App</h3>
+            <p class="project-desc">A simple task manager where you can add, complete, and delete tasks. Data is saved to localStorage so tasks persist after refreshing the page.</p>
+            <div class="project-links"><a href="todo_list_app_demo.html">Live Demo</a><a href="https://github.com/kaushalhadke-wq/To-do-list-app">GitHub</a></div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-thumb">🧮</div>
+          <div class="project-body">
+            <div class="project-tags"><span class="tag">Python</span><span class="tag">Tkinter</span></div>
+            <h3 class="project-name">GUI Calculator</h3>
+            <p class="project-desc">A desktop calculator with a graphical interface built using Python's Tkinter library. Supports basic arithmetic with a clean, minimal layout.</p>
+            <div class="project-links"><a  href="tkinter_calculator_demo.html">Live Demo</a><a href="https://github.com/kaushalhadke-wq/GUI-Calculator">GitHub</a></div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-thumb">📊</div>
+          <div class="project-body">
+            <div class="project-tags"><span class="tag">SQL</span><span class="tag">DBMS</span></div>
+            <h3 class="project-name">Library Management DB</h3>
+            <p class="project-desc">A relational database for managing books, members, and borrow records. Designed ER diagrams and wrote SQL queries for all CRUD operations.</p>
+            <div class="project-links"><a  href="library_management_db_demo.html">Live Demo</a><a href="https://github.com/kaushalhadke-wq/Library-Management-DB">GitHub</a></div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrapper">
+      <div class="section-header">
+        <span class="section-tag">// who i am</span>
+        <h2 class="section-title">About Me</h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-bio">
+          <h2>Hey there! 👋</h2>
+          <p>I'm <strong>Kaushal Hadke</strong>, a passionate Data science student at MIT Academy of Engineering, Alandi (MITAOE). I'm currently in my first year and really enjoying the journey of learning how technology works.</p>
+          <p>I started coding with Python and then moved to web development. Right now I'm learning how to make websites look good and work properly. I love the problem-solving part — when something finally works after hours of debugging, it feels amazing!</p>
+          <p>When I'm not coding, you'll find me watching tech YouTube videos, playing chess, or just exploring new apps and wondering how they were built.</p>
+          <div class="education-box">
+            <h4>Education</h4>
+            <p>B.Tech — Data Science</p>
+            <span>MIT Academy of Engineering, Alandi (MITAOE) · 2024–2028</span>
+          </div>
+          <div class="hobbies">
+            <span style="font-size:0.8rem; font-weight:600; color:var(--muted); width:100%; margin-bottom:4px;">Interests & Hobbies</span>
+            <span class="hobby-chip">♟️ Chess</span>
+            <span class="hobby-chip">📺 Tech YouTube</span>
+            <span class="hobby-chip">🎮 Gaming</span>
+            <span class="hobby-chip">🛠️ Building stuff</span>
+          </div>
+        </div>
+
+        <div class="skills-section">
+          <h3>Skills</h3>
+          <div class="skills-list">
+            <span class="hobby-chip">HTML &amp; CSS</span>
+            <span class="hobby-chip">Python</span>
+            <span class="hobby-chip">SQL / DBMS</span>
+            <span class="hobby-chip">C / C++</span>
+            <span class="hobby-chip">Git &amp; GitHub</span>
+          </div>
+          <h3 style="margin-top:28px; margin-bottom:14px;">Tools I Use</h3>
+          <ul style="list-style:none; display:flex; flex-wrap:wrap; gap:10px;">
+            <li class="hobby-chip">VS Code</li>
+            <li class="hobby-chip">GitHub</li>
+            <li class="hobby-chip">Figma (basics)</li>
+            <li class="hobby-chip">Google Colab</li>
+            <li class="hobby-chip">MySQL Workbench</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrapper">
+      <div class="section-header">
+        <span class="section-tag">// say hello</span>
+        <h2 class="section-title">Contact Me</h2>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h2>Let's Talk!</h2>
+          <p>Whether you want to collaborate on a project, give me feedback, or just say hi — I'd love to hear from you. I'm always open to learning and connecting.</p>
+          <div class="contact-detail">
+            <div class="contact-icon">📧</div>
+            <div><div style="font-weight:600; font-size:0.85rem;">Email</div><div style="color:var(--muted); font-size:0.85rem;">kaushalhadke@gmail.com</div></div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-icon">📍</div>
+            <div><div style="font-weight:600; font-size:0.85rem;">Location</div><div style="color:var(--muted); font-size:0.85rem;">Alandi, Pune, Maharashtra</div></div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-icon">🎓</div>
+            <div><div style="font-weight:600; font-size:0.85rem;">College</div><div style="color:var(--muted); font-size:0.85rem;">MITAOE, Alandi</div></div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-icon">💼</div>
+            <div><div style="font-weight:600; font-size:0.85rem;">LinkedIn</div><div style="color:var(--muted); font-size:0.85rem;">www.linkedin.com/in/kaushal-hadke-77634a192</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Made with <span>♥</span> by Kaushal Hadke · MITAOE, Alandi · 2026</p>
+  </footer>
+
+</body>
+</html>
